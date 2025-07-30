@@ -13,11 +13,13 @@ ASSETS = ["BTC", "ETH", "PAXG", "SOL"]
 CACHE = {}
 
 # map query aliases to cache keys
-QUERY_ALIASES = {"PAXG": "XAU"}
+# When a user queries XAU, return the cached PAXG data
+QUERY_ALIASES = {"XAU": "PAXG"}
 
 def cache_key(asset: str) -> str:
     """Return the key used for caching a given asset."""
-    return "XAU" if asset.upper() == "PAXG" else asset.upper()
+    # Keep the original asset name in the cache map
+    return asset.upper()
 def get_asset_price(asset="BTC"):
     response = requests.get(BASE_URL + f"public/get_index_price?index_name={asset.lower()}_usd")
     data = response.json()
@@ -116,7 +118,7 @@ def update_cache():
 @app.route("/")
 def index():
     return jsonify({
-        "message": "Use /volatility?asset=BTC, ETH, SOL or asset=XAU to get volatility data"
+        "message": "Use /volatility?asset=BTC, ETH, SOL or asset=XAU (PAXG) to get volatility data"
     })
 
 @app.route("/volatility")
