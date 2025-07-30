@@ -9,7 +9,7 @@ import os
 app = Flask(__name__)
 
 BASE_URL = "https://www.deribit.com/api/v2/"
-ASSETS = ["BTC", "ETH"]
+ASSETS = ["BTC", "ETH", "PAXG"]
 CACHE = {}
 
 def get_price(asset):
@@ -23,10 +23,12 @@ def fetch_options_with_iv(asset, price):
     now = datetime.datetime.utcnow()
     strike_range = (0.9 * price, 1.1 * price)
     options = []
-
+    max_time_gold = 604800 
+    max_time_all = 172800
+    max_time = max_time_gold if asset == "PAXG" else max_time_all
     for instr in instruments_data['result']:
         expiry = datetime.datetime.utcfromtimestamp(instr['expiration_timestamp'] / 1000)
-        if (expiry - now).total_seconds() <= 172800 and (expiry - now).total_seconds() >= 3 * 3600:
+        if (expiry - now).total_seconds() <= max_time and (expiry - now).total_seconds() >= 3 * 3600:
             strike = float(instr['strike'])
             if strike_range[0] <= strike <= strike_range[1]:
                 ticker_response = requests.get(BASE_URL + f"public/ticker?instrument_name={instr['instrument_name']}")
