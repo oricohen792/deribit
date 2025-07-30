@@ -26,7 +26,7 @@ def fetch_options_with_iv(asset, price):
 
     for instr in instruments_data['result']:
         expiry = datetime.datetime.utcfromtimestamp(instr['expiration_timestamp'] / 1000)
-        if (expiry - now).total_seconds() <= 172800:
+        if (expiry - now).total_seconds() <= 172800 and (expiry - now).total_seconds() >= 3 * 3600:
             strike = float(instr['strike'])
             if strike_range[0] <= strike <= strike_range[1]:
                 ticker_response = requests.get(BASE_URL + f"public/ticker?instrument_name={instr['instrument_name']}")
