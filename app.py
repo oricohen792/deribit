@@ -34,8 +34,7 @@ def fetch_options_with_iv(asset, price):
     for instr in instruments_data['result']:
         if instr['base_currency'] != asset.upper():
             continue
-    
-    for instr in instruments_data['result']:
+            
         expiry = datetime.datetime.fromtimestamp(instr['expiration_timestamp'] / 1000, datetime.timezone.utc)
         creation = datetime.datetime.fromtimestamp(instr['creation_timestamp'] / 1000, datetime.timezone.utc)
         if (expiry - now).total_seconds() <= max_time and (expiry - now).total_seconds() >= 3 * 3600 and ((now - creation).total_seconds() >= OPTIONS_MIN_LIFE_DAYS * 86400):
