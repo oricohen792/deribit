@@ -20,7 +20,8 @@ def get_price(asset):
     return get_asset_price(asset)
 
 def fetch_options_with_iv(asset, price):
-    instruments_response = requests.get(BASE_URL + f"public/get_instruments?currency={asset}&kind=option&expired=false")
+    instruments_response = requests.get(BASE_URL + f"public/get_instruments?currency="
+                                                   f"any&kind=option&expired=false")
     instruments_data = instruments_response.json()
     now = datetime.datetime.now(datetime.timezone.utc)
     strike_range = (0.9 * price, 1.1 * price)
@@ -29,6 +30,10 @@ def fetch_options_with_iv(asset, price):
     max_time_all = 172800
     max_time = max_time_gold if asset == "PAXG" else max_time_all
     OPTIONS_MIN_LIFE_DAYS = 0.5
+
+    for instr in instruments_data['result']:
+        if instr['base_currency'] != asset.upper():
+            continue
     
     for instr in instruments_data['result']:
         expiry = datetime.datetime.fromtimestamp(instr['expiration_timestamp'] / 1000, datetime.timezone.utc)
