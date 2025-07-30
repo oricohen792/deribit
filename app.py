@@ -11,11 +11,13 @@ app = Flask(__name__)
 BASE_URL = "https://www.deribit.com/api/v2/"
 ASSETS = ["BTC", "ETH", "PAXG"]
 CACHE = {}
-
-def get_price(asset):
-    response = requests.get(BASE_URL + f"public/ticker?instrument_name={asset}-PERPETUAL")
+def get_asset_price(asset="BTC"):
+    response = requests.get(BASE_URL + f"public/get_index_price?index_name={asset.lower()}_usd")
     data = response.json()
-    return data['result']['last_price']
+    return data['result']['index_price']
+    
+def get_price(asset):
+    return get_asset_price(asset)
 
 def fetch_options_with_iv(asset, price):
     instruments_response = requests.get(BASE_URL + f"public/get_instruments?currency={asset}&kind=option&expired=false")
