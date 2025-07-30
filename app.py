@@ -13,7 +13,7 @@ ASSETS = ["BTC", "ETH", "PAXG", "SOL"]
 CACHE = {}
 
 # map query aliases to cache keys
-QUERY_ALIASES = {"PAX": "XAU"}
+QUERY_ALIASES = {"PAXG": "XAU"}
 
 def cache_key(asset: str) -> str:
     """Return the key used for caching a given asset."""
