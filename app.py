@@ -28,9 +28,12 @@ def fetch_options_with_iv(asset, price):
     max_time_gold = 604800 
     max_time_all = 172800
     max_time = max_time_gold if asset == "PAXG" else max_time_all
+    OPTIONS_MIN_LIFE_DAYS = 0.5
+    
     for instr in instruments_data['result']:
         expiry = datetime.datetime.utcfromtimestamp(instr['expiration_timestamp'] / 1000)
-        if (expiry - now).total_seconds() <= max_time and (expiry - now).total_seconds() >= 3 * 3600:
+        creation = datetime.datetime.fromtimestamp(instr['creation_timestamp'] / 1000, datetime.timezone.utc)        
+        if (expiry - now).total_seconds() <= max_time and (expiry - now).total_seconds() >= 3 * 3600 and ((now - creation).total_seconds() >= OPTIONS_MIN_LIFE_DAYS * 86400):
             strike = float(instr['strike'])
             if strike_range[0] <= strike <= strike_range[1]:
                 ticker_response = requests.get(BASE_URL + f"public/ticker?instrument_name={instr['instrument_name']}")
