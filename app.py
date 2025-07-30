@@ -11,6 +11,13 @@ app = Flask(__name__)
 BASE_URL = "https://www.deribit.com/api/v2/"
 ASSETS = ["BTC", "ETH", "PAXG", "SOL"]
 CACHE = {}
+
+# map query aliases to cache keys
+QUERY_ALIASES = {"PAX": "XAU"}
+
+def cache_key(asset: str) -> str:
+    """Return the key used for caching a given asset."""
+    return "XAU" if asset.upper() == "PAXG" else asset.upper()
 def get_asset_price(asset="BTC"):
     response = requests.get(BASE_URL + f"public/get_index_price?index_name={asset.lower()}_usd")
     data = response.json()
@@ -95,7 +102,8 @@ def update_cache():
                 daily_vols, expiry_times = get_atm_iv(options, price)
                 if daily_vols:
                     simple, weighted = calculate_volatility(daily_vols, expiry_times)
-                    CACHE[asset] = {
+                    key = cache_key(asset)
+                    CACHE[key] = {
                         "price": price,
                         "simple_avg_vol": round(simple, 6),
                         "weighted_avg_vol": round(weighted, 6),
@@ -108,12 +116,13 @@ def update_cache():
 @app.route("/")
 def index():
     return jsonify({
-        "message": "Use /volatility?asset=BTC or asset=ETH to get volatility data"
+        "message": "Use /volatility?asset=BTC, ETH, SOL or asset=XAU to get volatility data"
     })
 
 @app.route("/volatility")
 def volatility():
     asset = request.args.get("asset", "BTC").upper()
+    asset = QUERY_ALIASES.get(asset, asset)
     if asset not in CACHE:
         return jsonify({"error": "Asset not found or not yet cached"}), 400
     return jsonify(CACHE[asset])
