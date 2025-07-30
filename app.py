@@ -9,7 +9,7 @@ import os
 app = Flask(__name__)
 
 BASE_URL = "https://www.deribit.com/api/v2/"
-ASSETS = ["BTC", "ETH", "PAXG"]
+ASSETS = ["BTC", "ETH", "PAXG", "SOL"]
 CACHE = {}
 def get_asset_price(asset="BTC"):
     response = requests.get(BASE_URL + f"public/get_index_price?index_name={asset.lower()}_usd")
