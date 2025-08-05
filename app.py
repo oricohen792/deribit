@@ -46,7 +46,8 @@ def fetch_options_with_iv(asset, price):
             
         expiry = datetime.datetime.fromtimestamp(instr['expiration_timestamp'] / 1000, datetime.timezone.utc)
         creation = datetime.datetime.fromtimestamp(instr['creation_timestamp'] / 1000, datetime.timezone.utc)
-        if (expiry - now).total_seconds() <= max_time and (expiry - now).total_seconds() >= 3 * 3600 and ((now - creation).total_seconds() >= OPTIONS_MIN_LIFE_DAYS * 86400):
+        if (expiry - now).total_seconds() <= max_time and (expiry - now).total_seconds() >= 12 * 3600 
+            and ((now - creation).total_seconds() >= OPTIONS_MIN_LIFE_DAYS * 86400):
             strike = float(instr['strike'])
             if strike_range[0] <= strike <= strike_range[1]:
                 ticker_response = requests.get(BASE_URL + f"public/ticker?instrument_name={instr['instrument_name']}")
