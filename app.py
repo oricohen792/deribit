@@ -89,7 +89,8 @@ def get_atm_iv(options, price):
 def calculate_volatility(daily_vols, expiry_times):
     distances = [abs(t - 1) for t in expiry_times]
     inv_distances = [1/d if d != 0 else 0 for d in distances]
-    weighted_avg = np.average(daily_vols, weights=inv_distances)
+    #weighted_avg = np.average(daily_vols, weights=inv_distances)
+    weighted_avg = np.min(daily_vols)
     simple_avg = np.mean(daily_vols)
     return simple_avg/365**0.5, weighted_avg/365**0.5
 
