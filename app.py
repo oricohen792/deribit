@@ -357,8 +357,8 @@ def update_cache():
                     key = cache_key(asset)
                     CACHE[key] = {
                         "price": price,
-                        "weighted_avg_vol": round(raw_1d_iv_annualized, 6),
-                        "smoothed_avg_vol": round(smoothed_1d_iv_annualized, 6),
+                        "weighted_avg_vol": round(raw_1d_iv_annualized/365**0.5, 6),
+                        "smoothed_avg_vol": round(smoothed_1d_iv_annualized/365**0.5, 6),
                         "timestamp": datetime.datetime.now(datetime.timezone.utc).isoformat().rsplit(sep="+")[0]
                     }
             except Exception as e:
