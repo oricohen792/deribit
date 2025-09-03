@@ -35,11 +35,12 @@ def fetch_options_with_iv(asset, price):
     now = datetime.datetime.now(datetime.timezone.utc)
     strike_range = (0.9 * price, 1.1 * price)
     options = []
-    max_time_gold = 604800 * 2
+    max_time_gold = 604800 * 4
     max_time_all = 172800
     max_time = max_time_gold if asset == "PAXG" else max_time_all
-    OPTIONS_MIN_LIFE_DAYS = 0.5
-
+    OPTIONS_MIN_LIFE_DAYS = 5 if asset == "PAXG" else 0.5
+        
+    
     for instr in instruments_data['result']:
         if instr['base_currency'] != asset.upper():
             continue
