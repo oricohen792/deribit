@@ -28,6 +28,25 @@ def get_asset_price(asset="BTC"):
 def get_price(asset):
     return get_asset_price(asset)
 
+def get_historical_volatility(asset):
+    """Get the most recent historical volatility from Deribit API"""
+    try:
+        url = f"{BASE_URL}public/get_historical_volatility"
+        params = {"currency": asset}
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            result = data.get('result', [])
+            if result:
+                # Get the last (most recent) value and normalize it
+                last_vol = result[-1][1]  # [timestamp, volatility]
+                normalized_vol = (last_vol / 100) / (365**0.5)
+                return normalized_vol
+        return None
+    except Exception as e:
+        print(f"Error getting historical volatility for {asset}: {e}")
+        return None
+
 def fetch_options_with_iv(asset, price):
     instruments_response = requests.get(BASE_URL + f"public/get_instruments?currency="
                                                    f"any&kind=option&expired=false")
@@ -109,11 +128,13 @@ def update_cache():
                 daily_vols, expiry_times = get_atm_iv(options, price, asset)
                 if daily_vols:
                     simple, weighted = calculate_volatility(daily_vols, expiry_times)
+                    historical_vol = get_historical_volatility(asset)
                     key = cache_key(asset)
                     CACHE[key] = {
                         "price": price,
                         "simple_avg_vol": round(simple, 6),
                         "weighted_avg_vol": round(weighted, 6),
+                        "historical_vol": round(historical_vol, 6) if historical_vol else None,
                         "timestamp": datetime.datetime.utcnow().isoformat()
                     }
             except Exception as e:
