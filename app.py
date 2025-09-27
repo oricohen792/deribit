@@ -9,7 +9,7 @@ import os
 app = Flask(__name__)
 
 BASE_URL = "https://www.deribit.com/api/v2/"
-ASSETS = ["BTC", "ETH", "PAXG", "SOL"]
+ASSETS = ["BTC"]
 CACHE = {}
 
 # map query aliases to cache keys
@@ -81,6 +81,7 @@ def fetch_options_with_iv(asset, price):
     return options
 
 def get_atm_iv(options, price, asset):
+    print("get_atm_iv")
     expiry_groups = {}
     for opt in options:
         expiry_groups.setdefault(opt['expiration_timestamp'], []).append(opt)
@@ -99,7 +100,9 @@ def get_atm_iv(options, price, asset):
             continue
 
         avg_iv = (call_iv + put_iv) / 2
+        
         T_days = (expiry / 1000 - now) / 86400
+        print(avg_iv, T_days)
         extrapolated_iv = avg_iv * np.sqrt(1 / T_days)
         if asset in ["PAXG", "XAU"]:
             extrapolated_iv = avg_iv
@@ -123,6 +126,7 @@ def update_cache():
             try:
                 price = get_price(asset)
                 options = fetch_options_with_iv(asset, price)
+                print("options: ", options, price)
                 if not options:
                     continue
                 daily_vols, expiry_times = get_atm_iv(options, price, asset)
@@ -155,7 +159,9 @@ def volatility():
         return jsonify({"error": "Asset not found or not yet cached"}), 400
     return jsonify(CACHE[asset])
 
-Thread(target=update_cache, daemon=True).start()
+#Thread(target=update_cache, daemon=True).start()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    print("Starting update_cache")
+    update_cache()
+    #app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
