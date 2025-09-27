@@ -61,7 +61,7 @@ def fetch_options_with_iv(asset, price):
 
     return options
 
-def get_atm_iv(options, price):
+def get_atm_iv(options, price, asset):
     print("get_atm_iv")
     expiry_groups = {}
     for opt in options:
@@ -85,6 +85,8 @@ def get_atm_iv(options, price):
         T_days = (expiry / 1000 - now) / 86400
         print(avg_iv, T_days)
         extrapolated_iv = avg_iv * np.sqrt(1 / T_days)
+        if asset in ["PAXG", "XAU"]:
+            extrapolated_iv = avg_iv
         daily_vols.append(extrapolated_iv)
         expiry_times.append(T_days)
 
@@ -108,7 +110,7 @@ def update_cache():
                 print("options: ", options, price)
                 if not options:
                     continue
-                daily_vols, expiry_times = get_atm_iv(options, price)
+                daily_vols, expiry_times = get_atm_iv(options, price, asset)
                 if daily_vols:
                     simple, weighted = calculate_volatility(daily_vols, expiry_times)
                     key = cache_key(asset)
